@@ -1,0 +1,90 @@
+{
+  "共通" : {
+    "list" : [
+      {
+        "title" : "APIトークンの取得",
+        "class" : "VccToken"
+      },
+      {
+        "title" : "デバイス認証コードの発行",
+        "class" : "VccDeviceCode"
+      },
+      {
+        "title" : "登録済みデバイスの解除",
+        "class" : "VccDeviceUnregist"
+      },
+      {
+        "title" : "登録済みデバイス一覧の取得",
+        "class" : "VccDeviceList"
+      }
+    ]
+  },
+  "VCSリモート" : {
+    "list" : [
+      {
+        "title" : "[POST] ログイン",
+        "class" : "VccRemote_POST_LoginUser"
+      },
+      {
+        "title" : "[POST] カメラ一覧",
+        "class" : "VccRemote_POST_UserCameraPhycam"
+      },
+      {
+        "title" : "[POST] 画像一覧",
+        "class" : "VccRemote_POST_UserViewSlide"
+      },
+      {
+        "title" : "[POST] 画像",
+        "class" : "VccRemote_POST_UserViewImageDownload"
+      },
+      {
+        "title" : "[POST] アナライズ",
+        "class" : "VccRemote_POST_UserViewAnalyze"
+      },
+      {
+        "title" : "[POST] エクスポート",
+        "class" : "VccRemote_POST_UserViewExportAsync"
+      },
+      {
+        "title" : "[HEAD] ステータスの確認",
+        "class" : "VccRemote_HEAD"
+      },
+      {
+        "title" : "[GET] データの取得",
+        "class" : "VccRemote_GET"
+      }
+    ]
+  },
+  "BLOB" : {
+    "list" : [
+      {
+        "title" : "[POST] ロケーション一覧",
+        "class" : "VccBlob_POST_BlobServiceLocation"
+      },
+      {
+        "title" : "[POST] 画像一覧",
+        "class" : "VccBlob_POST_BlobServiceSlide"
+      },
+      {
+        "title" : "[POST] 画像",
+        "class" : "VccBlob_POST_BlobServiceImageDownload"
+      },
+      {
+        "title" : "[POST] アナライズ",
+        "class" : "VccBlob_POST_BlobServiceAnalyze"
+      },
+      {
+        "title" : "[POST] エクスポート",
+        "class" : "VccBlob_POST_BlobServiceExportAsync"
+      },
+      {
+        "title" : "[HEAD] ステータスの確認",
+        "class" : "VccBlob_HEAD"
+      },
+      {
+        "title" : "[GET] データの取得",
+        "class" : "VccBlob_GET"
+      }
+    ]
+  }
+}

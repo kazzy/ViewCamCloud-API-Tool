@@ -1,0 +1,17 @@
+{
+    "Ident": "dev2.d.nexts.tv", 
+    "API_KEY": "2e263ddcffe617c9b24f29b5d0444b415e431c6c7a9dea55f3b221a0c214fc81", 
+    "location": "location01", 
+    "API_TOKEN": "98d367709c5cf4e0d019ded2006f63eb066223428641bf649c489d0300b7f864", 
+    "API_SECRET": "98f22e52f37736240535d2fadd50ab2c4270e5167e667c860be0531149832d07", 
+    "hostname": "dev2.d.nexts.tv", 
+    "HOST": "https://api-v3.nexts.tv", 
+    "token": "207636cbd1dd0d32c31d1f2e740debd811dde3cde6d83f1021e7c773399e241e", 
+    "user": "admin", 
+    "MessageId": "2a63cea6-6a74-53b5-9700-810824b99b56@api-v3-nexts-tv_demo2_d_nexts_tv", 
+    "Serial": "CSZ00033", 
+    "password": "camerastation", 
+    "Type": "vcs", 
+    "dtfrom": "20160512T173000+0900", 
+    "dtto": "20160512T180000+0900"
+}
