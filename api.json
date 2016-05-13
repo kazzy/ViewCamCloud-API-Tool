@@ -23,35 +23,35 @@
     "list" : [
       {
         "title" : "[POST] ログイン",
-        "class" : "VccRemote_POST_LoginUser"
+        "class" : "VccRemotePostLoginUser"
       },
       {
         "title" : "[POST] カメラ一覧",
-        "class" : "VccRemote_POST_UserCameraPhycam"
+        "class" : "VccRemotePostUserCameraPhycam"
       },
       {
         "title" : "[POST] 画像一覧",
-        "class" : "VccRemote_POST_UserViewSlide"
+        "class" : "VccRemotePostUserViewSlide"
       },
       {
         "title" : "[POST] 画像",
-        "class" : "VccRemote_POST_UserViewImageDownload"
+        "class" : "VccRemotePostUserViewImageDownload"
       },
       {
         "title" : "[POST] アナライズ",
-        "class" : "VccRemote_POST_UserViewAnalyze"
+        "class" : "VccRemotePostUserViewAnalyze"
       },
       {
         "title" : "[POST] エクスポート",
-        "class" : "VccRemote_POST_UserViewExportAsync"
+        "class" : "VccRemotePostUserViewExportAsync"
       },
       {
         "title" : "[HEAD] ステータスの確認",
-        "class" : "VccRemote_HEAD"
+        "class" : "VccRemoteHead"
       },
       {
         "title" : "[GET] データの取得",
-        "class" : "VccRemote_GET"
+        "class" : "VccRemoteGet"
       }
     ]
   },

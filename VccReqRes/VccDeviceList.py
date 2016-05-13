@@ -7,15 +7,15 @@ from PySide import QtCore, QtGui, QtWebKit
 from utils         import *
 from VccReqResBase import *
 
-class VccToken(VccReqResBase):
+class VccDeviceList(VccReqResBase):
     """
-        共通 > APIトークンの取得
+        共通 > 登録済デバイス一覧の取得
     """
     def __init__(self, parent, grid):
         """
             UIを設定する
         """
-        super(VccToken, self).__init__(parent, grid)
+        super(VccDeviceList, self).__init__(parent, grid)
 
         ###############################################################
         (label, param) = self.set_defaultUI_request_Param()
@@ -40,11 +40,11 @@ class VccToken(VccReqResBase):
         """
             通信を行う
         """
-        url = '%s/token/' % (confv("HOST"))
+        url = '%s/device/list/' % (confv("HOST"))
         params = {
         }
         headers = {
-            'X-VCC-API-KEYSET' : 'key=%s&secret=%s' % (confv("API_KEY"), confv("API_SECRET")),
+            'X-VCC-API-TOKEN' : confv("API_TOKEN")
         }
         r = requests.get(url, params=params, headers=headers)
 

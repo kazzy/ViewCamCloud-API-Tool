@@ -10,6 +10,9 @@ class VccReqResBase(QtGui.QWidget):
     """
     def __init__(self, parent, grid):
         super(VccReqResBase, self).__init__(parent)
+        while grid.count():
+            item = grid.takeAt(0)
+            item.widget().deleteLater()
         self.grid = grid
         self.grid_inside = {}
 
@@ -85,44 +88,61 @@ class VccReqResBase(QtGui.QWidget):
 
         return (label, raw)
 
-    def set_response_TreeView_columnset(self, widget, data):
+    def set_response_TreeView_columnset(self, widget, k, v):
         """
             デフォルトUIのレスポンスツリービューにカラムセットを設定
         """
-        for k,v in data.items():
-            print "%s" % k
+        if isinstance(v, dict):
             item = QtGui.QTreeWidgetItem(widget)
             item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            item.setText(1, "{}")
+            item.setText(2, u"オブジェクト")
+            for k2,v2 in v.items():
+                self.set_response_TreeView_columnset(item, k2, v2)
 
-            if isinstance(v, bool):
-                item.setText(0, k)
-                item.setText(1, str(v))
-                item.setText(2, u"ブール") # bool is int's subclass
-            elif isinstance(v, str):
-                item.setText(0, k)
-                item.setText(1, str(v))
-                item.setText(2, u"文字列")
-            elif isinstance(v, unicode):
-                item.setText(0, k)
-                item.setText(1, str(v))
-                item.setText(2, u"文字列")
-            elif isinstance(v, int):
-                item.setText(0, k)
-                item.setText(1, str(v))
-                item.setText(2, u"数値")
-            elif isinstance(v, list):
-                item.setText(0, k)
-                if len(v) >= 1:
-                    item.setText(1, "[0...%s]" % (len(v)-1) )
-                else:
-                    item.setText(1, "[0]")
-                item.setText(2, u"リスト")
-                self.set_response_TreeView_columnset(item, v)
-            elif isinstance(v, dict):
-                item.setText(0, k)
-                item.setText(1, "[%s]" % index)
-                item.setText(2, u"オブジェクト")
-                self.set_response_TreeView_columnset(item, v)
+        elif isinstance(v, list):
+            item = QtGui.QTreeWidgetItem(widget)
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            if len(v) >= 1:
+                item.setText(1, "[0...%s]" % (len(v)-1) )
             else:
-                item.setText(0, k)
-                item.setText(2, u"Unknown")
+                item.setText(1, "[-]")
+            item.setText(2, u"リスト")
+            for i, d in enumerate(v):
+                self.set_response_TreeView_columnset(item, str(i), d)
+
+        elif isinstance(v, bool):
+            item = QtGui.QTreeWidgetItem(widget)
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            item.setText(1, str(v))
+            item.setText(2, u"ブール") # bool is int's subclass
+
+        elif isinstance(v, str) or isinstance(v, unicode):
+            item = QtGui.QTreeWidgetItem(widget)
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            item.setText(1, str(v))
+            item.setText(2, u"文字列")
+
+        elif isinstance(v, int):
+            item = QtGui.QTreeWidgetItem(widget)
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            item.setText(1, str(v))
+            item.setText(2, u"数値")
+
+        else:
+            item = QtGui.QTreeWidgetItem(widget)
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+            
+            item.setText(0, k)
+            item.setText(1, str(v))
+            item.setText(2, u"Unknown")

@@ -8,10 +8,11 @@
     "HOST": "https://api-v3.nexts.tv", 
     "token": "81aa95b0c147dccc17fbdeca40096136cb52a0299d5b78577e0919e5b57cbca7", 
     "user": "admin", 
-    "MessageId": "8bd6d59e-0a28-5163-baf3-9a3124a99bc5@api-v3-nexts-tv_dev2_d_nexts_tv", 
+    "MessageId": "644442f2-fbb3-5066-8f93-0d5d61014557@api-v3-nexts-tv_dev2_d_nexts_tv", 
     "Serial": "CSZ00033", 
     "password": "camerastation", 
     "Type": "vcs", 
+    "id": "57343f08019ca60bf2721214", 
     "dtfrom": "20160512T173000+0900", 
     "dtto": "20160512T180000+0900"
 }
