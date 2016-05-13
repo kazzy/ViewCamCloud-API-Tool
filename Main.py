@@ -1,5 +1,5 @@
 #!E:\python27\python.exe
-# -*- coding: cp932 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 import os
@@ -10,21 +10,15 @@ import requests
 from requests_toolbelt.utils import dump
 from PySide import QtCore, QtGui, QtWebKit
 
+from utils     import *
+from VccReqRes import *
+
 VERSION = "1.0.0"
 URL = {
     "github"    : "https://github.com/plusseed/ViewCamCloud-API-Tool",
     "reference" : "https://api-v3.nexts.tv/doc/",
     "manual"    : "https://github.com/plusseed/ViewCamCloud-API-Tool",
 }
-
-def confv(key):
-    """
-        �v���t�@�C���ݒ�l�̎擾
-    """
-    with open('default.json') as fp:
-        data = json.load(fp)
-
-    return data.get(key)
 
 class UiMain(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -35,7 +29,7 @@ class UiMain(QtGui.QMainWindow):
             print e
 
     def initUI(self):
-        self.setWindowTitle('ViewCamCloud API Tool')
+        self.setWindowTitle(u'ViewCamCloud API Tool')
         self.setWindowIcon(QtGui.QIcon('favicon.png'))
         self.setFixedSize(800, 600)
 
@@ -48,45 +42,46 @@ class UiMain(QtGui.QMainWindow):
 
     def initMenubar(self):
         '''
-            ���j���[�o�[
+            メニューバー
         '''
         Lmenubar = self.menuBar()
 
         ###############################################################
-        p = Lmenubar.addMenu('�v���t�@�C��')
-        p1 = p.addAction('�ݒ�')
+        p = Lmenubar.addMenu(u'プロファイル')
+        p1 = p.addAction(u'設定')
         p1.triggered.connect(self.open_ProfileSetting)
-        #p.addAction('�ǂݍ���')
+        #p.addAction('読み込み')
         p.addSeparator()
         files = glob.glob('cache/*.profile')
         for filename in files:
             unique, ext = os.path.splitext(os.path.basename(filename))
             p.addAction(unique)
         p.addSeparator()
-        p.addAction('�I��')
+        p.addAction(u'終了')
 
         ###############################################################
-        t = Lmenubar.addMenu('�c�[��')
-        #t.addAction('�}�N���̓ǂݍ���')
-        #t.addAction('�}�N���̋L�^')
+        t = Lmenubar.addMenu(u'ツール')
+        #t.addAction(u'マクロの読み込み')
+        #t.addAction(u'マクロの記録')
+        #t.addAction(u'マクロの再生')
 
         ###############################################################
         Rmenubar = QtGui.QMenuBar(Lmenubar)
         Lmenubar.setCornerWidget(Rmenubar, QtCore.Qt.TopRightCorner)
 
-        h = Rmenubar.addMenu('�w���v')
-        h1 = h.addAction('API���t�@�����X')
+        h = Rmenubar.addMenu(u'ヘルプ')
+        h1 = h.addAction(u'APIリファレンス')
         h1.triggered.connect(self.open_ApiReference)
-        h2 = h.addAction('�g����')
+        h2 = h.addAction(u'使い方')
         h2.triggered.connect(self.open_Manual)
-        h3 = h.addAction('�o�[�W����')
+        h3 = h.addAction(u'バージョン')
         h3.triggered.connect(self.open_Version)
 
         self.setMenuBar(Lmenubar)
 
     def initApiTree(self):
         '''
-            API�c���[
+            APIツリー
         '''
         width  = self.frameGeometry().width()
         height = self.frameGeometry().height()
@@ -97,7 +92,7 @@ class UiMain(QtGui.QMainWindow):
         ApiTree.move(0, 20)
 
         ApiTree.setColumnCount(1)
-        ApiTree.setHeaderLabels(["API�ꗗ"])
+        ApiTree.setHeaderLabels([u"API一覧"])
 
         apis = json.load(open("api.json"))
         for key in apis.keys():
@@ -115,7 +110,7 @@ class UiMain(QtGui.QMainWindow):
 
     def on_click_ApiTree(self, item, column):
         '''
-            API�ꗗ�N���b�N��
+            API一覧クリック時
         '''
         child = item.data(column, QtCore.Qt.UserRole)
         print child
@@ -134,7 +129,7 @@ class UiMain(QtGui.QMainWindow):
 
     def initHistory(self):
         '''
-            ����
+            履歴
         '''
         width  = self.frameGeometry().width()
         height = self.frameGeometry().height()
@@ -145,7 +140,7 @@ class UiMain(QtGui.QMainWindow):
         History.move(0, int(height * 0.6)+20+1)
 
         History.setColumnCount(1)
-        History.setHeaderLabels(["����"])
+        History.setHeaderLabels([u"履歴"])
 
         for i in range(50):
             item = QtGui.QTreeWidgetItem(History)
@@ -157,35 +152,35 @@ class UiMain(QtGui.QMainWindow):
 
     def open_ProfileSetting(self):
         '''
-            �v���t�@�C�� > �ݒ�
+            プロファイル > 設定
         '''
         self.UiProfileSetting = UiProfileSetting(self)
         self.UiProfileSetting.show()
 
     def open_ApiReference(self):
         '''
-            �w���v > API���t�@�����X
+            ヘルプ > APIリファレンス
         '''
         self.UiApiReference = UiApiReference()
         self.UiApiReference.show()
 
     def open_Manual(self):
         '''
-            �w���v > �g����
+            ヘルプ > 使い方
         '''
         self.UiManual = UiManual()
         self.UiManual.show()
 
     def open_Version(self):
         '''
-            �w���v > �o�[�W����
+            ヘルプ > バージョン
         '''
         self.UiVersion = UiVersion(self)
         self.UiVersion.show()
 
 class UiReqRes(QtGui.QWidget):
     '''
-        ���N�G�X�g�E���X�|���X�p���C�A�E�g
+        リクエスト・レスポンス用レイアウト
     '''
     def __init__(self, parent=None):
         super(UiReqRes, self).__init__(parent)
@@ -200,192 +195,13 @@ class UiReqRes(QtGui.QWidget):
 
         self.setLayout(self.grid)
 
-class VccToken(QtGui.QWidget):
-    def __init__(self, parent, grid):
-        super(VccToken, self).__init__(parent)
-        self.grid = grid
-
-        ###############################################################
-        text = "���N�G�X�g"
-        label = QtGui.QLabel(text)
-        self.grid.addWidget(label, 0, 0)
-
-        self.param = QtGui.QTreeWidget(self)
-        self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
-        self.param.header().setStretchLastSection(False)
-        self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^"])
-        self.param.setStyleSheet("QTreeWidget { background-color: rgb(220, 220, 220); }");
-        self.grid.addWidget(self.param, 1, 0)
-
-        ###############################################################
-        button = QtGui.QPushButton("��")
-        button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
-        button.clicked.connect(self.run_request)
-        self.grid.addWidget(button, 2, 0)
-
-        ###############################################################
-        text = "���X�|���X"
-        self.label = QtGui.QLabel(text)
-        self.grid.addWidget(self.label, 3, 0)
-
-        self.view = QtGui.QTreeWidget(self)
-        self.view.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
-        self.view.header().setStretchLastSection(False)
-        self.view.setColumnCount(3)
-        self.view.setHeaderLabels(["key", "value", "type"])
-        self.view.setStyleSheet("QTreeWidget { background-color: rgb(220, 220, 220); }");
-        self.grid.addWidget(self.view, 4, 0)
-
-        ###############################################################
-        text = "Raw"
-        label = QtGui.QLabel(text)
-        self.grid.addWidget(label, 5, 0)
-
-        self.raw = QtGui.QPlainTextEdit(self)
-        self.raw.setStyleSheet("QPlainTextEdit { background-color: rgb(220, 220, 220); font-size: 8pt; font-family: Courier; }");
-
-        self.grid.addWidget(self.raw, 6, 0)
-
-    def run_request(self):
-        url = '%s/token/' % (confv("HOST"))
-        params = {
-        }
-        headers = {
-            'X-VCC-API-KEYSET' : 'key=%s&secret=%s' % (confv("API_KEY"), confv("API_SECRET")),
-        }
-        r = requests.get(url, params=params, headers=headers)
-        rawstr = dump.dump_all(r)
-        self.raw.setPlainText(rawstr.decode('utf-8'))
-
-        self.view.clear()
-        if r.status_code == 200:
-            data = r.json()
-            for k,v in data.items():
-                item = QtGui.QTreeWidgetItem(self.view)
-                item.setText(0, k)
-                item.setText(1, str(v))
-                item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
-                #item2 = QtGui.QTreeWidgetItem(item)
-                #item2.setText(0, "child")
-
-                if isinstance(v, bool):
-                    item.setText(2, "�u�[��") # bool is int's subclass
-                elif isinstance(v, str):
-                    item.setText(2, "������")
-                elif isinstance(v, unicode):
-                    item.setText(2, "������")
-                elif isinstance(v, int):
-                    item.setText(2, "���l")
-                else:
-                    item.setText(2, "Unknown")
-
-class VccDeviceCode(QtGui.QWidget):
-    def __init__(self, parent, grid):
-        super(VccDeviceCode, self).__init__(parent)
-        self.grid = grid
-
-        ###############################################################
-        text = "���N�G�X�g"
-        label = QtGui.QLabel(text)
-        self.grid.addWidget(label, 0, 0)
-
-        self.param = QtGui.QTreeWidget(self)
-        self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
-        self.param.header().setStretchLastSection(False)
-        self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^"])
-        self.param.setStyleSheet("QTreeWidget { background-color: rgb(220, 220, 220); }");
-        self.grid.addWidget(self.param, 1, 0)
-
-        ###############################################################
-        button = QtGui.QPushButton("��")
-        button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
-        button.clicked.connect(self.run_request)
-        self.grid.addWidget(button, 2, 0)
-
-        ###############################################################
-        text = "���X�|���X"
-        self.label = QtGui.QLabel(text)
-        self.grid.addWidget(self.label, 3, 0)
-
-        self.view = QtGui.QTreeWidget(self)
-        self.view.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
-        self.view.header().setStretchLastSection(False)
-        self.view.setColumnCount(3)
-        self.view.setHeaderLabels(["key", "value", "type"])
-        self.view.setStyleSheet("QTreeWidget { background-color: rgb(220, 220, 220); }");
-        self.grid.addWidget(self.view, 4, 0)
-
-        ###############################################################
-        text = "Raw"
-        label = QtGui.QLabel(text)
-        self.grid.addWidget(label, 5, 0)
-
-        self.raw = QtGui.QPlainTextEdit(self)
-        self.raw.setStyleSheet("QPlainTextEdit { background-color: rgb(220, 220, 220); font-size: 8pt; font-family: Courier; }");
-
-        self.grid.addWidget(self.raw, 6, 0)
-
-    def run_request(self):
-        url = '%s/device/code/' % (confv("HOST"))
-        params = {
-        }
-        headers = {
-            'X-VCC-API-TOKEN' : confv("API_TOKEN")
-        }
-        r = requests.get(url, params=params, headers=headers)
-        rawstr = dump.dump_all(r)
-        self.raw.setPlainText(rawstr.decode('utf-8'))
-
-        self.view.clear()
-        if r.status_code == 200:
-            data = r.json()
-            for k,v in data.items():
-                item = QtGui.QTreeWidgetItem(self.view)
-                item.setText(0, k)
-                item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
-                if isinstance(v, bool):
-                    item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
-                elif isinstance(v, str):
-                    item.setText(1, str(v))
-                    item.setText(2, "������")
-                elif isinstance(v, unicode):
-                    item.setText(1, str(v))
-                    item.setText(2, "������")
-                elif isinstance(v, int):
-                    item.setText(1, str(v))
-                    item.setText(2, "���l")
-                elif isinstance(v, list):
-                    if len(v) >= 1:
-                        item.setText(1, "[0...%s]" % (len(v)-1))
-                    else:
-                        item.setText(1, "[]")
-                    item.setText(2, "���X�g")
-                    for k2, v2 in v:
-                        item2 = QtGui.QTreeWidgetItem(item)
-                        item2.setText(0, k2)
-                        item2.setText(1, str(v2))
-                        item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
-                        if isinstance(v2, bool):
-                            item2.setText(2, "�u�[��") # bool is int's subclass
-                        elif isinstance(v2, str):
-                            item2.setText(2, "������")
-                        elif isinstance(v2, unicode):
-                            item2.setText(2, "������")
-                        elif isinstance(v2, int):
-                            item2.setText(2, "���l")
-                else:
-                    item.setText(2, "Unknown")
-
 class VccDeviceUnregist(QtGui.QWidget):
     def __init__(self, parent, grid):
         super(VccDeviceUnregist, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -393,7 +209,7 @@ class VccDeviceUnregist(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -415,13 +231,13 @@ class VccDeviceUnregist(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -434,7 +250,7 @@ class VccDeviceUnregist(QtGui.QWidget):
         self.grid.addWidget(self.view, 4, 0)
 
         ###############################################################
-        text = "Raw"
+        text = u"Raw"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 5, 0)
 
@@ -470,37 +286,37 @@ class VccDeviceUnregist(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1))
                     else:
                         item.setText(1, "[]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for k2, v2 in v:
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, k2)
                         item2.setText(1, str(v2))
                         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                         if isinstance(v2, bool):
-                            item2.setText(2, "�u�[��") # bool is int's subclass
+                            item2.setText(2, u"ブール") # bool is int's subclass
                         elif isinstance(v2, str):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, unicode):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, int):
-                            item2.setText(2, "���l")
+                            item2.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
 
 class VccDeviceList(QtGui.QWidget):
     def __init__(self, parent, grid):
@@ -508,7 +324,7 @@ class VccDeviceList(QtGui.QWidget):
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -516,18 +332,18 @@ class VccDeviceList(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^"])
+        self.param.setHeaderLabels(["パラメータ"])
         self.param.setStyleSheet("QTreeWidget { background-color: rgb(220, 220, 220); }");
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -540,7 +356,7 @@ class VccDeviceList(QtGui.QWidget):
         self.grid.addWidget(self.view, 4, 0)
 
         ###############################################################
-        text = "Raw"
+        text = u"Raw"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 5, 0)
 
@@ -569,26 +385,26 @@ class VccDeviceList(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1) )
                     else:
                         item.setText(1, "[0]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for index, device in enumerate(v):
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, "[%s]" % index)
-                        item2.setText(2, "�I�u�W�F�N�g") # bool is int's subclass
+                        item2.setText(2, u"オブジェクト") # bool is int's subclass
 
                         for k3, v3 in device.items():
                             item3 = QtGui.QTreeWidgetItem(item2)
@@ -596,26 +412,26 @@ class VccDeviceList(QtGui.QWidget):
                             item3.setText(1, str(v3))
                             item3.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                             if isinstance(v3, bool):
-                                item3.setText(2, "�u�[��") # bool is int's subclass
+                                item3.setText(2, u"ブール") # bool is int's subclass
                             elif isinstance(v3, str):
-                                item3.setText(2, "������")
+                                item3.setText(2, u"文字列")
                             elif isinstance(v3, unicode):
-                                item3.setText(2, "������")
+                                item3.setText(2, u"文字列")
                             elif isinstance(v3, int):
-                                item3.setText(2, "���l")
+                                item3.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
 
 class VccRemote_POST_LoginUser(QtGui.QWidget):
     """
-        [POST] ���O�C��
+        [POST] ログイン
     """
     def __init__(self, parent, grid):
         super(VccRemote_POST_LoginUser, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -623,7 +439,7 @@ class VccRemote_POST_LoginUser(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -647,13 +463,13 @@ class VccRemote_POST_LoginUser(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -709,48 +525,48 @@ class VccRemote_POST_LoginUser(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1))
                     else:
                         item.setText(1, "[]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for k2, v2 in v:
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, k2)
                         item2.setText(1, str(v2))
                         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                         if isinstance(v2, bool):
-                            item2.setText(2, "�u�[��") # bool is int's subclass
+                            item2.setText(2, u"ブール") # bool is int's subclass
                         elif isinstance(v2, str):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, unicode):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, int):
-                            item2.setText(2, "���l")
+                            item2.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
 
 class VccRemote_POST_UserCameraPhycam(QtGui.QWidget):
     """
-        [POST] �J�����ꗗ
+        [POST] カメラ一覧
     """
     def __init__(self, parent, grid):
         super(VccRemote_POST_UserCameraPhycam, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -758,7 +574,7 @@ class VccRemote_POST_UserCameraPhycam(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -778,13 +594,13 @@ class VccRemote_POST_UserCameraPhycam(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -840,48 +656,48 @@ class VccRemote_POST_UserCameraPhycam(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1))
                     else:
                         item.setText(1, "[]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for k2, v2 in v:
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, k2)
                         item2.setText(1, str(v2))
                         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                         if isinstance(v2, bool):
-                            item2.setText(2, "�u�[��") # bool is int's subclass
+                            item2.setText(2, u"ブール") # bool is int's subclass
                         elif isinstance(v2, str):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, unicode):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, int):
-                            item2.setText(2, "���l")
+                            item2.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
 
 class VccRemote_POST_UserViewSlide(QtGui.QWidget):
     """
-        [POST] �摜�ꗗ
+        [POST] 画像一覧
     """
     def __init__(self, parent, grid):
         super(VccRemote_POST_UserViewSlide, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -889,7 +705,7 @@ class VccRemote_POST_UserViewSlide(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -924,13 +740,13 @@ class VccRemote_POST_UserViewSlide(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -943,7 +759,7 @@ class VccRemote_POST_UserViewSlide(QtGui.QWidget):
         self.grid.addWidget(self.view, 4, 0)
 
         ###############################################################
-        text = "Raw"
+        text = u"Raw"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 5, 0)
 
@@ -986,48 +802,48 @@ class VccRemote_POST_UserViewSlide(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1))
                     else:
                         item.setText(1, "[]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for k2, v2 in v:
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, k2)
                         item2.setText(1, str(v2))
                         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                         if isinstance(v2, bool):
-                            item2.setText(2, "�u�[��") # bool is int's subclass
+                            item2.setText(2, u"ブール") # bool is int's subclass
                         elif isinstance(v2, str):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, unicode):
-                            item2.setText(2, "������")
+                            item2.setText(2, u"文字列")
                         elif isinstance(v2, int):
-                            item2.setText(2, "���l")
+                            item2.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
 
 class VccRemote_HEAD(QtGui.QWidget):
     """
-        [HEAD] �X�e�[�^�X�̊m�F
+        [HEAD] ステータスの確認
     """
     def __init__(self, parent, grid):
         super(VccRemote_HEAD, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = "リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -1035,7 +851,7 @@ class VccRemote_HEAD(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -1046,13 +862,13 @@ class VccRemote_HEAD(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -1065,7 +881,7 @@ class VccRemote_HEAD(QtGui.QWidget):
         self.grid.addWidget(self.view, 4, 0)
 
         ###############################################################
-        text = "Raw"
+        text = u"Raw"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 5, 0)
 
@@ -1090,14 +906,14 @@ class VccRemote_HEAD(QtGui.QWidget):
 
 class VccRemote_GET(QtGui.QWidget):
     """
-        [GET] �f�[�^�̎擾
+        [GET] データの取得
     """
     def __init__(self, parent, grid):
         super(VccRemote_GET, self).__init__(parent)
         self.grid = grid
 
         ###############################################################
-        text = "���N�G�X�g"
+        text = u"リクエスト"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 0, 0)
 
@@ -1105,7 +921,7 @@ class VccRemote_GET(QtGui.QWidget):
         self.param.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.param.header().setStretchLastSection(False)
         self.param.setColumnCount(1)
-        self.param.setHeaderLabels(["�p�����[�^", "�l"])
+        self.param.setHeaderLabels([u"パラメータ", u"値"])
         self.param.setColumnCount(2)
 
         item = QtGui.QTreeWidgetItem(self.param)
@@ -1116,13 +932,13 @@ class VccRemote_GET(QtGui.QWidget):
         self.grid.addWidget(self.param, 1, 0)
 
         ###############################################################
-        button = QtGui.QPushButton("��")
+        button = QtGui.QPushButton(u"↓")
         button.setStyleSheet("QPushButton {background-color: rgb(67, 135, 233)}")
         button.clicked.connect(self.run_request)
         self.grid.addWidget(button, 2, 0)
 
         ###############################################################
-        text = "���X�|���X"
+        text = u"レスポンス"
         self.label = QtGui.QLabel(text)
         self.grid.addWidget(self.label, 3, 0)
 
@@ -1135,7 +951,7 @@ class VccRemote_GET(QtGui.QWidget):
         self.grid.addWidget(self.view, 4, 0)
 
         ###############################################################
-        text = "Raw"
+        text = u"Raw"
         label = QtGui.QLabel(text)
         self.grid.addWidget(label, 5, 0)
 
@@ -1162,7 +978,7 @@ class VccRemote_GET(QtGui.QWidget):
 
         print r.headers['Content-Type']
         if r.headers['Content-Type'] == 'application/json':
-            # QTreeWidget (�ȉ��͉�)
+            # QTreeWidget (以下は仮)
             data = r.json()
             for k,v in data.items():
                 item = QtGui.QTreeWidgetItem(self.view)
@@ -1170,26 +986,26 @@ class VccRemote_GET(QtGui.QWidget):
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 if isinstance(v, bool):
                     item.setText(1, str(v))
-                    item.setText(2, "�u�[��") # bool is int's subclass
+                    item.setText(2, u"ブール") # bool is int's subclass
                 elif isinstance(v, str):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, unicode):
                     item.setText(1, str(v))
-                    item.setText(2, "������")
+                    item.setText(2, u"文字列")
                 elif isinstance(v, int):
                     item.setText(1, str(v))
-                    item.setText(2, "���l")
+                    item.setText(2, u"数値")
                 elif isinstance(v, list):
                     if len(v) >= 1:
                         item.setText(1, "[0...%s]" % (len(v)-1) )
                     else:
                         item.setText(1, "[0]")
-                    item.setText(2, "���X�g")
+                    item.setText(2, u"リスト")
                     for index, device in enumerate(v):
                         item2 = QtGui.QTreeWidgetItem(item)
                         item2.setText(0, "[%s]" % index)
-                        item2.setText(2, "�I�u�W�F�N�g") # bool is int's subclass
+                        item2.setText(2, u"オブジェクト") # bool is int's subclass
 
                         for k3, v3 in device.items():
                             item3 = QtGui.QTreeWidgetItem(item2)
@@ -1197,15 +1013,15 @@ class VccRemote_GET(QtGui.QWidget):
                             item3.setText(1, str(v3))
                             item3.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                             if isinstance(v3, bool):
-                                item3.setText(2, "�u�[��") # bool is int's subclass
+                                item3.setText(2, u"ブール") # bool is int's subclass
                             elif isinstance(v3, str):
-                                item3.setText(2, "������")
+                                item3.setText(2, u"文字列")
                             elif isinstance(v3, unicode):
-                                item3.setText(2, "������")
+                                item3.setText(2, u"文字列")
                             elif isinstance(v3, int):
-                                item3.setText(2, "���l")
+                                item3.setText(2, u"数値")
                 else:
-                    item.setText(2, "Unknown")
+                    item.setText(2, u"Unknown")
         elif r.headers['Content-Type'] == 'image/jpeg':
             # QGraphicsView
             pass
@@ -1218,11 +1034,11 @@ class VccRemote_GET(QtGui.QWidget):
 
 class UiProfileSetting(QtGui.QDialog):
     '''
-        �v���t�@�C�� > �ݒ�_�C�A���O
+        プロファイル > 設定ダイアログ
     '''
     def __init__(self, parent=None):
         super(UiProfileSetting, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
-        self.setWindowTitle("�v���t�@�C���ݒ�")
+        self.setWindowTitle(u"プロファイル設定")
         self.setFixedSize(640, 480)
         self.setModal(True)
 
@@ -1255,7 +1071,7 @@ class UiProfileSetting(QtGui.QDialog):
 
     def on_click_save(self):
         '''
-            �{�^����������Ƃ���default.json��o�͂���
+            ボタンを押したときにdefault.jsonを出力する
         '''
         data = {}
         iter = QtGui.QTreeWidgetItemIterator(self.ConfTree)
@@ -1273,7 +1089,7 @@ class UiProfileSetting(QtGui.QDialog):
 
 class UiApiReference(QtWebKit.QWebView):
     '''
-        API���t�@�����X�p�E�C���h�E
+        APIリファレンス用ウインドウ
     '''
     def __init__(self, parent=None):
         super(UiApiReference, self).__init__(parent)
@@ -1283,7 +1099,7 @@ class UiApiReference(QtWebKit.QWebView):
 
 class UiManual(QtWebKit.QWebView):
     '''
-        �g�����p�E�C���h�E
+        使い方用ウインドウ
     '''
     def __init__(self, parent=None):
         super(UiManual, self).__init__(parent)
@@ -1292,7 +1108,7 @@ class UiManual(QtWebKit.QWebView):
 
 class UiVersion(QtGui.QDialog):
     '''
-        �o�[�W�����\���p�_�C�A���O
+        バージョン表示用ダイアログ
     '''
     def __init__(self, parent=None):
         super(UiVersion, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
@@ -1320,7 +1136,7 @@ class UiVersion(QtGui.QDialog):
 
     def open_GitHubUrl(self):
         '''
-            �{�^����������Ƃ��ɋK��̃u���E�U�ŊJ��
+            ボタンを押したときに規定のブラウザで開く
         '''
         url = QtCore.QUrl(URL["github"])
         QtGui.QDesktopServices.openUrl(url)
