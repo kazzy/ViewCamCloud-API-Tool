@@ -66,6 +66,7 @@ class VccRemoteHead(VccReqResBase):
         item.setText(0, "MessageId")
         item.setText(1, confv("MessageId"))
         item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item.setExpanded(True)
 
         self.grid_inside['request_Param.param'] = param
 
@@ -76,9 +77,10 @@ class VccRemoteHead(VccReqResBase):
             通信を行う
         """
         url = '%s/remote/' % (confv("HOST"))
-        params = {
-            "MessageId": confv("MessageId")
-        }
+        params = {}
+        items = treeitem_dict(self.inside('request_Param.param'))
+        params.update(items)
+
         headers = {
             'X-VCC-API-TOKEN' : confv("API_TOKEN")
         }
@@ -97,4 +99,6 @@ class VccRemoteHead(VccReqResBase):
 
         self.inside('response_HeadView.status').clear()
         if r.status_code == 200:
+            path = save_history(rawstr, r)
+
             self.inside('response_HeadView.status').setText(r.headers['X-Vcc-Api-Queue-Status'])

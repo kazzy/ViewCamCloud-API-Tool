@@ -1,4 +1,3 @@
-#!E:\python27\python.exe
 # -*- coding: utf-8 -*-
 
 import sys
@@ -31,8 +30,6 @@ class UiMain(QtGui.QMainWindow):
             print e
 
     def resizeEvent(self, event):
-        print "resize : %s -> %s" % (event.oldSize(), event.size())
-
         width  = event.size().width()
         height = event.size().height()
 
@@ -133,7 +130,6 @@ class UiMain(QtGui.QMainWindow):
             API一覧クリック時
         '''
         child = item.data(column, QtCore.Qt.UserRole)
-        print child
         grid = self.UiReqRes.grid
         if child:
             # show right widget

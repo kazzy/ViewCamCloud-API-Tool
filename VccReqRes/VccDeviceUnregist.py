@@ -55,16 +55,19 @@ class VccDeviceUnregist(VccReqResBase):
         item.setText(0, "Type")
         item.setText(1, confv("Type"))
         item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item.setExpanded(True)
 
         item = QtGui.QTreeWidgetItem(param)
         item.setText(0, "Ident")
         item.setText(1, confv("Ident"))
         item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item.setExpanded(True)
 
         item = QtGui.QTreeWidgetItem(param)
         item.setText(0, "Serial")
         item.setText(1, confv("Serial"))
         item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item.setExpanded(True)
 
         self.grid_inside['request_Param.param'] = param
 
@@ -76,13 +79,9 @@ class VccDeviceUnregist(VccReqResBase):
         """
         url = '%s/device/unregist/' % (confv("HOST"))
         payload = {}
-        iter = QtGui.QTreeWidgetItemIterator(self.inside('request_Param.param'))
-        while iter.value():
-            item = iter.value()
-            key   = item.text(0)
-            value = item.text(1)
-            payload[key] = value
-            iter += 1
+        items = treeitem_dict(self.inside('request_Param.param'))
+        payload.update(items)
+
         headers = {
             'X-VCC-API-TOKEN' : confv("API_TOKEN")
         }
@@ -101,6 +100,7 @@ class VccDeviceUnregist(VccReqResBase):
 
         self.inside('response_TreeView.view').clear()
         if r.status_code == 200:
+            path = save_history(rawstr, r)
             data = r.json()
             widget = self.inside('response_TreeView.view')
             self.set_response_TreeView_columnset(widget, "root", data)

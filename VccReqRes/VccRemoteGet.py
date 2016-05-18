@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import os
 import requests
 import json
 from requests_toolbelt.utils import dump
-from PySide import QtCore, QtGui, QtWebKit
+from PySide import QtCore, QtGui, QtWebKit, phonon
+import tempfile
 
 from utils         import *
 from VccReqResBase import *
@@ -65,6 +67,7 @@ class VccRemoteGet(VccReqResBase):
         item.setText(0, "MessageId")
         item.setText(1, confv("MessageId"))
         item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item.setExpanded(True)
 
         self.grid_inside['request_Param.param'] = param
 
@@ -75,9 +78,10 @@ class VccRemoteGet(VccReqResBase):
             通信を行う
         """
         url = '%s/remote/' % (confv("HOST"))
-        params = {
-            "MessageId": confv("MessageId")
-        }
+        params = {}
+        items = treeitem_dict(self.inside('request_Param.param'))
+        params.update(items)
+
         headers = {
             'X-VCC-API-TOKEN' : confv("API_TOKEN")
         }
@@ -85,25 +89,31 @@ class VccRemoteGet(VccReqResBase):
 
         return r
 
-    def set_json_view(self, content):
+    def set_json_view(self, rawstr, r):
         """
             JSONビュー
         """
+        path = save_history(rawstr, r)
+
         (_, view) = self.set_defaultUI_response_TreeView()
         self.grid.addWidget(view, 4, 0)
 
-        data = json.loads(content)
+        data = r.json()
         self.set_response_TreeView_columnset(view, "root", data)
 
-    def set_image_view(self, content):
+    def set_image_view(self, rawstr, r):
         """
             JPEGビュー
         """
+        path = save_history(rawstr, r)
+
         view = QtGui.QGraphicsView(self)
         scene = QtGui.QGraphicsScene(view)
         pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(content)
+        pixmap.loadFromData(r.content)
         item = QtGui.QGraphicsPixmapItem(pixmap)
+
+        items = treeitem_dict(self.inside('request_Param.param'))
 
         width  = self.grid_inside['response_GetView.widget'].width() - 2
         height = self.grid_inside['response_GetView.widget'].height() - 2
@@ -130,17 +140,39 @@ class VccRemoteGet(VccReqResBase):
 
         self.grid.addWidget(view, 4, 0)
 
-    def content_view(self, content_type, content):
+    def set_video_view(self, rawstr, r):
+        """
+            VIDEOビュー
+        """
+        path = save_history(rawstr, r)
+
+        media = phonon.Phonon.MediaObject(self)
+        view  = phonon.Phonon.VideoWidget(self)
+
+        phonon.Phonon.createPath(media, view)
+
+        width  = self.grid_inside['response_GetView.widget'].width() - 2
+        height = self.grid_inside['response_GetView.widget'].height() - 2
+
+        view.resize(width, height)
+
+        self.grid.addWidget(view, 4, 0)
+
+        media.setCurrentSource(path)
+        media.play()
+
+    def content_view(self, rawstr, content_type, r):
         """
             Content-Typeに応じたView
         """
         content_method = {
             'application/json' : self.set_json_view,
             'image/jpeg'       : self.set_image_view,
+            'video/x-msvideo'  : self.set_video_view,
         }
         method = content_method.get(content_type, None)
         if method:
-            method(content)
+            method(rawstr, r)
 
     def on_click(self):
         """
@@ -157,4 +189,5 @@ class VccRemoteGet(VccReqResBase):
 
         #self.inside('response_GetView.widget').deleteLater()
         if r.status_code == 200:
-            self.content_view(r.headers['Content-Type'], r.content)
+            print "content-length : %s" % len(r.content)
+            self.content_view(rawstr, r.headers['Content-Type'], r)

@@ -61,6 +61,7 @@ class VccDeviceCode(VccReqResBase):
 
         self.inside('response_TreeView.view').clear()
         if r.status_code == 200:
+            path = save_history(rawstr, r)
             data = r.json()
             widget = self.inside('response_TreeView.view')
             self.set_response_TreeView_columnset(widget, "root", data)

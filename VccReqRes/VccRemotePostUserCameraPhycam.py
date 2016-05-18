@@ -54,19 +54,23 @@ class VccRemotePostUserCameraPhycam(VccReqResBase):
 
         item = QtGui.QTreeWidgetItem(param)
         item.setText(0, "Target")
+        item.setExpanded(True)
 
         item2 = QtGui.QTreeWidgetItem(item)
         item2.setText(0, "hostname")
         item2.setText(1, confv("hostname"))
         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item2.setExpanded(True)
 
         item = QtGui.QTreeWidgetItem(param)
         item.setText(0, "Parameter")
+        item.setExpanded(True)
 
         item2 = QtGui.QTreeWidgetItem(item)
         item2.setText(0, "token")
         item2.setText(1, confv("token"))
         item2.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        item2.setExpanded(True)
 
         self.grid_inside['request_Param.param'] = param
 
@@ -80,18 +84,8 @@ class VccRemotePostUserCameraPhycam(VccReqResBase):
         payload = {
             "Request": "UserCameraPhycam"
         }
-        iter = QtGui.QTreeWidgetItemIterator(self.inside('request_Param.param'))
-        while iter.value():
-            item = iter.value()
-            key = item.text(0)
-            print key
-            payload[key] = {}
-            for child in item.takeChildren():
-                key2   = child.text(0)
-                value2 = child.text(1)
-                print "  + %s = %s" % (key2, value2)
-                payload[key][key2] = value2
-            iter += 1
+        items = treeitem_dict(self.inside('request_Param.param'))
+        payload.update(items)
 
         headers = {
             'X-VCC-API-TOKEN' : confv("API_TOKEN")
@@ -111,6 +105,7 @@ class VccRemotePostUserCameraPhycam(VccReqResBase):
 
         self.inside('response_TreeView.view').clear()
         if r.status_code == 200:
+            path = save_history(rawstr, r)
             data = r.json()
             widget = self.inside('response_TreeView.view')
             self.set_response_TreeView_columnset(widget, "root", data)

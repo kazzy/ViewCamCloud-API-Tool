@@ -101,6 +101,7 @@ class VccReqResBase(QtGui.QWidget):
             item.setText(2, u"オブジェクト")
             for k2,v2 in v.items():
                 self.set_response_TreeView_columnset(item, k2, v2)
+            item.setExpanded(True)
 
         elif isinstance(v, list):
             item = QtGui.QTreeWidgetItem(widget)
@@ -114,6 +115,7 @@ class VccReqResBase(QtGui.QWidget):
             item.setText(2, u"リスト")
             for i, d in enumerate(v):
                 self.set_response_TreeView_columnset(item, str(i), d)
+            item.setExpanded(True)
 
         elif isinstance(v, bool):
             item = QtGui.QTreeWidgetItem(widget)
