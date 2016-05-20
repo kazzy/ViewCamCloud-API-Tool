@@ -59,15 +59,15 @@
     "list" : [
       {
         "title" : "[POST] ロケーション一覧",
-        "class" : "VccBlob_POST_BlobServiceLocation"
+        "class" : "VccBlobPostBlobServiceLocation"
       },
       {
         "title" : "[POST] 画像一覧",
-        "class" : "VccBlob_POST_BlobServiceSlide"
+        "class" : "VccBlobPostBlobServiceSlide"
       },
       {
         "title" : "[POST] 画像",
-        "class" : "VccBlob_POST_BlobServiceImageDownload"
+        "class" : "VccBlobPostBlobServiceImageDownload"
       },
       {
         "title" : "[POST] アナライズ",
@@ -79,11 +79,11 @@
       },
       {
         "title" : "[HEAD] ステータスの確認",
-        "class" : "VccBlob_HEAD"
+        "class" : "VccBlobHead"
       },
       {
         "title" : "[GET] データの取得",
-        "class" : "VccBlob_GET"
+        "class" : "VccBlobGet"
       }
     ]
   }
