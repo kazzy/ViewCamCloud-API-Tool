@@ -65,7 +65,12 @@ def save_history(raw, r):
     if not ext:
         return None
 
-    path = 'history/%s@%s.' % (dtstr, pid)
+    raw_dir = "history"
+
+    if(os.path.isdir(raw_dir) == False):
+        os.makedirs(raw_dir)
+
+    path = os.path.join(raw_dir, 'h%s@%s.' % (dtstr, pid))
     with open(path + 'raw', 'wb') as fp:
         fp.write(raw)
 
