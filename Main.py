@@ -7,6 +7,7 @@ import os
 import json
 import glob
 import inspect
+import datetime
 import requests
 from requests_toolbelt.utils import dump
 from PySide import QtCore, QtGui, QtWebKit
@@ -158,13 +159,27 @@ class UiMain(QtGui.QMainWindow):
         History.setColumnCount(1)
         History.setHeaderLabels([u"履歴"])
 
-        for i in range(50):
+        histList = glob.glob('history/*.raw')
+        for histItem in histList:
+            bnSplit     = os.path.basename(histItem).split('@')
+            histDate = datetime.datetime.strptime(bnSplit[0], '%Y%m%dT%H%M%S')
+            histDateStr = histDate.strftime('%Y/%m/%d %H:%M:%S')
+
             item = QtGui.QTreeWidgetItem(History)
-            item.setText(0, str(i))
+            item.setText(0, histDateStr)
+            item.setText(1, histItem)
 
         History.resize(int(width * 0.25), int(height * 0.4)-20-1)
+        History.itemClicked.connect(self.on_click_History)
 
         return History
+
+    def on_click_History(self, item, column):
+        '''
+            履歴一覧クリック時
+        '''
+        histFileName = item.text(1)
+        print "item : %s / column : %s / data : %s" % (item, column, histFileName)
 
     def open_ProfileSetting(self):
         '''

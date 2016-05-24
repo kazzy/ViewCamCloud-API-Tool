@@ -27,7 +27,8 @@ def treeitem_dict(treeitem):
             resp[k] = v
         else:
             resp[k] = {}
-            for child in item.takeChildren():
+            for cindex in xrange(1, item.childCount()):
+                child = item.child(cindex)
                 cresp = get_dict(child)
                 resp[k].update(cresp)
         return resp
