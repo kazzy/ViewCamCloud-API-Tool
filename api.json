@@ -71,11 +71,11 @@
       },
       {
         "title" : "[POST] アナライズ",
-        "class" : "VccBlob_POST_BlobServiceAnalyze"
+        "class" : "VccBlobPostBlobServiceAnalyze"
       },
       {
         "title" : "[POST] エクスポート",
-        "class" : "VccBlob_POST_BlobServiceExportAsync"
+        "class" : "VccBlobPostBlobServiceExportAsync"
       },
       {
         "title" : "[HEAD] ステータスの確認",

@@ -18,6 +18,8 @@ from VccRemoteGet                           import *
 from VccBlobPostBlobServiceLocation         import *
 from VccBlobPostBlobServiceSlide            import *
 from VccBlobPostBlobServiceImageDownload    import *
+from VccBlobPostBlobServiceAnalyze          import *
+from VccBlobPostBlobServiceExportAsync      import *
 
 from VccBlobHead                            import *
 from VccBlobGet                             import *

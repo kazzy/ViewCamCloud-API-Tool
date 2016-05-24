@@ -2,12 +2,12 @@
     "Type": "vcs", 
     "Ident": "dev2.d.nexts.tv", 
     "API_KEY": "2e263ddcffe617c9b24f29b5d0444b415e431c6c7a9dea55f3b221a0c214fc81", 
-    "API_TOKEN": "b65126f123b1f7ca389feec5cd0c2ae1634fc90ed9bf5775e8a199cf37715a8f", 
+    "API_TOKEN": "b956daecc87d7d9b679571d696149b36d939de5d9cf4af2f22b1b5b3fdff12d1", 
     "API_SECRET": "98f22e52f37736240535d2fadd50ab2c4270e5167e667c860be0531149832d07", 
     "user": "admin", 
     "hostname": "dev2.d.nexts.tv", 
     "HOST": "https://api-v3.nexts.tv", 
-    "token": "0d349f4231d989583667c4f1007f42b77a0bf3c5125114623a433a085bc0109c", 
+    "token": "b956daecc87d7d9b679571d696149b36d939de5d9cf4af2f22b1b5b3fdff12d1", 
     "ext": ".json", 
     "codec": "wmv2", 
     "location": "location02", 
@@ -16,6 +16,7 @@
     "password": "camerastation", 
     "type": "MH", 
     "id": "57343f08019ca60bf2721214", 
-    "dtfrom": "20160517T170000+0900", 
-    "dtto": "20160517T180000+0900"
+    "dtfrom": "20160524T090000+0900", 
+    "dtto": "20160524T093000+0900",
+    "fps" : "20"
 }
